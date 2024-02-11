@@ -33,7 +33,7 @@ class _HomePageState extends State<HomePage> {
           ),
           const SizedBox(width: 10),
           const Text(
-            "Mes conversations",
+            "My chats",
             style: kBold14,
           ),
           const Spacer(),

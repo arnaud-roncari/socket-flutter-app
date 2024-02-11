@@ -1,5 +1,3 @@
-import 'package:intl/intl.dart';
-
 extension TimeExtension on DateTime {
   String getWeekday() {
     switch (weekday) {
@@ -22,10 +20,10 @@ extension TimeExtension on DateTime {
   }
 
   String getTime() {
-    return DateFormat.Hm().format(this);
+    return "${toLocal().hour}:${toLocal().minute}";
   }
 
   String getWTime() {
-    return "${getWeekday()} ${DateFormat.Hm().format(this)}";
+    return "${getWeekday()} ${getTime()}";
   }
 }

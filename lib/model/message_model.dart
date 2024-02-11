@@ -1,9 +1,24 @@
+enum MessageStatus {
+  success,
+  loading,
+  failed,
+}
+
 class MessageModel {
   final String userId;
   final String text;
   final DateTime createdAt;
 
-  MessageModel({required this.userId, required this.text, required this.createdAt});
+  MessageStatus status;
+  final String? requestUuid;
+
+  MessageModel({
+    required this.userId,
+    required this.text,
+    required this.createdAt,
+    this.status = MessageStatus.success,
+    this.requestUuid,
+  });
 
   factory MessageModel.fromJson(Map<String, dynamic> json) {
     return MessageModel(

@@ -1,4 +1,5 @@
-const String kApiUrl = 'http://localhost:3000';
+const String kHttpUrl = 'http://localhost:3000';
+const String kWsUrl = 'ws://localhost:3000';
 
 String? kJwt;
 

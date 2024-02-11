@@ -5,9 +5,23 @@ sealed class CreateChatEvent {}
 
 class OnUsersFetched extends CreateChatEvent {}
 
-class OnChatCreated extends CreateChatEvent {
+class OnCreateChat extends CreateChatEvent {
   final UserModel recipient;
   final UserModel sender;
 
-  OnChatCreated({required this.recipient, required this.sender});
+  OnCreateChat({required this.recipient, required this.sender});
+}
+
+class OnCreateChatSuccess extends CreateChatEvent {
+  final String requestUuid;
+  final ChatModel chat;
+
+  OnCreateChatSuccess({required this.requestUuid, required this.chat});
+}
+
+class OnCreateChatFailed extends CreateChatEvent {
+  final String requestUuid;
+  final ApiException exception;
+
+  OnCreateChatFailed({required this.requestUuid, required this.exception});
 }

@@ -33,7 +33,7 @@ class _LoginPageState extends State<LoginPage> {
             onPressed: () {
               Navigator.pushReplacementNamed(context, "/signup");
             },
-            child: Text("Inscription", style: kBold18.copyWith(color: kBlack)),
+            child: Text("Signup", style: kBold18.copyWith(color: kBlack)),
           ),
         ],
       ),
@@ -46,10 +46,10 @@ class _LoginPageState extends State<LoginPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Connexion", style: kBold40),
+          Text("Login", style: kBold40),
           SizedBox(height: 10),
           Text(
-            "Identifiez-vous avec votre nom d’utilisateur et votre mot de passe pour accéder à vos messages.",
+            "Log in with your username and password to access your messages.",
             style: kRegular20,
           ),
         ],
@@ -100,14 +100,14 @@ class _LoginPageState extends State<LoginPage> {
 
                           /// Should be 60 height, but do no take parent height.
                           TextFormField(
-                            decoration: kTfDecoration.copyWith(hintText: 'Nom d\'utilisateur'),
+                            decoration: kTfDecoration.copyWith(hintText: 'Username'),
                             controller: _usernameController,
                             validator: Validator.username,
                           ),
                           const SizedBox(height: 10),
                           TextFormField(
                             obscureText: true,
-                            decoration: kTfDecoration.copyWith(hintText: 'Mot de passe'),
+                            decoration: kTfDecoration.copyWith(hintText: 'Password'),
                             controller: _passwordController,
                             validator: Validator.password,
                           ),
@@ -132,7 +132,7 @@ class _LoginPageState extends State<LoginPage> {
                                       }
                                     },
                                     child: Text(
-                                      "Connexion",
+                                      "Login",
                                       style: kBold18.copyWith(color: kWhite),
                                     ),
                                   ),

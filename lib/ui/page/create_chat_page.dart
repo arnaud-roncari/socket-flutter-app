@@ -41,10 +41,10 @@ class _CreateChatPageState extends State<CreateChatPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Créez une conversation", style: kBold40),
+          Text("Create a chat", style: kBold40),
           SizedBox(height: 10),
           Text(
-            "Ajoutez un proche avec son nom d’utilisateur et commencez à discuter !",
+            "Add a friend with his username and start chatting!",
             style: kRegular20,
           ),
         ],
@@ -66,8 +66,7 @@ class _CreateChatPageState extends State<CreateChatPage> {
         if (state is CreateChatFailure) {
           showSnackBarError(context: context, exception: state.exception);
         }
-        if (state is CreatedChatSuccess) {
-          context.read<HomeBloc>().add(OnCreateChatSuccess(chat: state.chat));
+        if (state is OnChatCreatedSuccess) {
           context
               .read<ChatBloc>()
               .add(OnChatOpened(recipient: state.recipient, sender: state.sender, chat: state.chat));
@@ -95,7 +94,7 @@ class _CreateChatPageState extends State<CreateChatPage> {
                   ),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: state is! CreateChatSuccess
+                    child: state is CreateChatLoading
                         ? const Center(
                             child: CircularProgressIndicator(color: kPrimary),
                           )
@@ -103,7 +102,7 @@ class _CreateChatPageState extends State<CreateChatPage> {
                             children: [
                               const SizedBox(height: 60),
                               TextField(
-                                decoration: kTfDecoration.copyWith(hintText: 'Nom d\'utilisateur'),
+                                decoration: kTfDecoration.copyWith(hintText: 'Username'),
                                 controller: _usernameController,
                                 onChanged: (String username) {
                                   filterdUsers.clear();
@@ -111,7 +110,7 @@ class _CreateChatPageState extends State<CreateChatPage> {
                                     setState(() {});
                                     return;
                                   }
-                                  for (UserModel user in state.users) {
+                                  for (UserModel user in (state as CreateChatSuccess).users) {
                                     if (user.username.toLowerCase().startsWith(username.toLowerCase())) {
                                       filterdUsers.add(user);
                                     }
@@ -134,7 +133,7 @@ class _CreateChatPageState extends State<CreateChatPage> {
                                             UserModel sender = context.read<HomeBloc>().user;
                                             context
                                                 .read<CreateChatBloc>()
-                                                .add(OnChatCreated(recipient: user, sender: sender));
+                                                .add(OnCreateChat(recipient: user, sender: sender));
                                           },
                                           child: Row(
                                             children: [

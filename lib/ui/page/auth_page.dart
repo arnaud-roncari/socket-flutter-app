@@ -31,12 +31,12 @@ class _AuthPageState extends State<AuthPage> {
                 children: [
                   const SizedBox(height: 60),
                   const Text(
-                    "Bienvenue",
+                    "Welcome",
                     style: kBold40,
                   ),
                   const SizedBox(height: 10),
                   const Text(
-                    "Discutez avec vos amis !",
+                    "Talk to your friends!",
                     style: kRegular20,
                   ),
                   const SizedBox(height: 40),
@@ -51,7 +51,7 @@ class _AuthPageState extends State<AuthPage> {
                               Navigator.pushNamed(context, "/login");
                             },
                             child: Text(
-                              "Connexion",
+                              "Login",
                               style: kBold18.copyWith(color: kWhite),
                             ),
                           ),
@@ -68,7 +68,7 @@ class _AuthPageState extends State<AuthPage> {
                               Navigator.pushNamed(context, "/signup");
                             },
                             child: Text(
-                              "Inscription",
+                              "Signup",
                               style: kBold18.copyWith(color: kBlack),
                             ),
                           ),

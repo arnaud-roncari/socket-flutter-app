@@ -1,10 +1,11 @@
+import 'dart:async';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:socket_flutter_app/bloc/chat/chat_bloc.dart';
 import 'package:socket_flutter_app/common/decoration.dart';
-import 'package:socket_flutter_app/common/extensions/time.dart';
 import 'package:socket_flutter_app/model/chat_model.dart';
-import 'package:socket_flutter_app/model/message_model.dart';
 import 'package:socket_flutter_app/model/user_model.dart';
 import 'package:socket_flutter_app/ui/widget/message_bubble.dart';
 
@@ -19,6 +20,8 @@ class _ChatPageState extends State<ChatPage> {
   late ChatModel chat;
   late UserModel sender;
   late UserModel recipient;
+  final TextEditingController _messageController = TextEditingController();
+  Timer? timer;
 
   Widget _buildAppBar() {
     return Container(
@@ -52,11 +55,9 @@ class _ChatPageState extends State<ChatPage> {
                   recipient.username,
                   style: kBold14,
                 ),
-
-                /// Upgrade Implement socket
                 Text(
-                  "En ligne",
-                  style: kBold12.copyWith(color: kGrey),
+                  "Online",
+                  style: kBold12.copyWith(color: recipient.isConnected ? kGrey : kWhite),
                 ),
               ],
             ),
@@ -74,11 +75,48 @@ class _ChatPageState extends State<ChatPage> {
         child: Container(
           constraints: const BoxConstraints(maxHeight: 100),
           child: TextField(
+            controller: _messageController,
             maxLines: null,
-            decoration: kTfDecoration.copyWith(hintText: "Écrivez un message..."),
-            onSubmitted: (String message) {
-              // Envoyer un message en DB
+            onChanged: (_) {
+              /// Re build page to display the tap button to send message.
+              setState(() {});
+
+              /// Notify server that sender is writing.
+              /// If already set, we restart the timer.
+              if (timer != null) {
+                timer!.cancel();
+                timer = Timer.periodic(const Duration(seconds: 2), (_) {
+                  context.read<ChatBloc>().add(OnTyping(chat: chat, isTyping: false));
+                  timer!.cancel();
+                  timer = null;
+                });
+              } else {
+                /// Otherwise we notify the server that the sender is writing.
+                context.read<ChatBloc>().add(OnTyping(chat: chat, isTyping: true));
+                timer = Timer.periodic(const Duration(seconds: 2), (_) {
+                  context.read<ChatBloc>().add(OnTyping(chat: chat, isTyping: false));
+                  timer!.cancel();
+                  timer = null;
+                });
+              }
             },
+            decoration: kTfDecoration.copyWith(
+              hintText: "Type a message...",
+              suffixIcon: _messageController.text.isEmpty
+                  ? null
+                  : IconButton(
+                      onPressed: () {
+                        context.read<ChatBloc>().add(
+                              OnCreateMessage(
+                                text: _messageController.text,
+                                chat: chat,
+                              ),
+                            );
+                        _messageController.clear();
+                      },
+                      icon: const Icon(CupertinoIcons.arrow_up),
+                    ),
+            ),
           ),
         ),
       ),
@@ -86,71 +124,61 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     ChatBloc bloc = context.read<ChatBloc>();
     chat = bloc.chat;
     sender = bloc.sender;
     recipient = bloc.recipient;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: kLightGrey,
-      body: Column(
-        children: [
-          _buildAppBar(),
-          Expanded(
-            child: ListView.builder(
-              padding: EdgeInsets.zero,
-              itemCount: chat.messages.length,
-              itemBuilder: (_, int index) {
-                MessageModel message = chat.messages.elementAt(index);
-                bool isSender = message.userId == sender.id;
-
-                bool isPreviousMessage = false;
-                bool isNextMessage = false;
-
-                /// We want to disable the curve effect only with messages from same author.
-                /// Same behavior as Messenger.
-                /// So we first check if the previous message is from the same author.
-                /// Then, same for the next.
-                /// The booleans will be used to define the curve. if it's 0 or not.
-                if (index > 0 && chat.messages[index - 1].userId == message.userId) {
-                  isPreviousMessage = true;
-                }
-                if (index + 1 < chat.messages.length && chat.messages[index + 1].userId == message.userId) {
-                  isNextMessage = true;
-                }
-
-                /// Only display if next message is older than one minute, or if this is the last message.
-                bool isTimeDisplayed = (index + 1 < chat.messages.length &&
-                        chat.messages[index + 1].createdAt.difference(message.createdAt).inMinutes > 1) ||
-                    index == chat.messages.length - 1;
-
-                /// The day is only displayed if message is older than 24 hours.
-                String displayedTime = DateTime.now().difference(message.createdAt).inHours > 24
-                    ? message.createdAt.getWTime()
-                    : message.createdAt.getTime();
-                return Column(
-                  children: [
-                    Padding(
-                      padding: index == 0 ? const EdgeInsets.only(top: 10) : EdgeInsets.zero,
-                      child: MessageBubble(
-                        isSender: isSender,
-                        message: message,
-                        isPreviousMessage: isPreviousMessage,
-                        isNextMessage: isNextMessage,
-                      ),
+      body: BlocConsumer<ChatBloc, ChatState>(
+        listener: (context, state) {},
+        builder: (context, state) {
+          return Column(
+            children: [
+              _buildAppBar(),
+              Expanded(
+                child: Builder(
+                  builder: (_) {
+                    List<Widget> messageBubbles = [];
+                    for (int i = chat.messages.length - 1; i >= 0; i--) {
+                      messageBubbles.add(
+                        MessageBubble(
+                          sender: sender,
+                          message: chat.messages[i],
+                          previousMessage: i - 1 >= 0 ? chat.messages[i - 1] : null,
+                          nextMessage: i + 1 < chat.messages.length ? chat.messages[i + 1] : null,
+                        ),
+                      );
+                    }
+                    return ListView(
+                      reverse: true,
+                      padding: EdgeInsets.zero,
+                      children: messageBubbles,
+                    );
+                  },
+                ),
+              ),
+              if (recipient.isTyping)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 5, left: 20),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "${recipient.username} is typing ...",
+                      style: kBold12.copyWith(color: kGrey),
                     ),
-                    if (isTimeDisplayed)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 2),
-                        child: Text(displayedTime, style: kRegular10.copyWith(color: kGrey)),
-                      )
-                  ],
-                );
-              },
-            ),
-          ),
-          _buildTextField(context),
-        ],
+                  ),
+                ),
+              _buildTextField(context),
+            ],
+          );
+        },
       ),
     );
   }

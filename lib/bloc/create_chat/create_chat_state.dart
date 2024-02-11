@@ -19,10 +19,10 @@ final class CreateChatSuccess extends CreateChatState {
   CreateChatSuccess({required this.users});
 }
 
-final class CreatedChatSuccess extends CreateChatState {
+final class OnChatCreatedSuccess extends CreateChatState {
   final ChatModel chat;
   final UserModel sender;
   final UserModel recipient;
 
-  CreatedChatSuccess({required this.chat, required this.sender, required this.recipient});
+  OnChatCreatedSuccess({required this.chat, required this.sender, required this.recipient});
 }

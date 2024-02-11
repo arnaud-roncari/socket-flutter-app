@@ -33,7 +33,7 @@ class _SignupPageState extends State<SignupPage> {
             onPressed: () {
               Navigator.pushReplacementNamed(context, "/login");
             },
-            child: Text("Connexion", style: kBold18.copyWith(color: kBlack)),
+            child: Text("Login", style: kBold18.copyWith(color: kBlack)),
           ),
         ],
       ),
@@ -46,10 +46,10 @@ class _SignupPageState extends State<SignupPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Inscription", style: kBold40),
+          Text("Signup", style: kBold40),
           SizedBox(height: 10),
           Text(
-            "Créez un compte avec un nom d’utilisateur et un mot de passe.",
+            "Create an account with a username and password.",
             style: kRegular20,
           ),
         ],
@@ -98,14 +98,14 @@ class _SignupPageState extends State<SignupPage> {
                         children: [
                           const SizedBox(height: 60),
                           TextFormField(
-                            decoration: kTfDecoration.copyWith(hintText: 'Nom d\'utilisateur'),
+                            decoration: kTfDecoration.copyWith(hintText: 'Username'),
                             controller: _usernameController,
                             validator: Validator.username,
                           ),
                           const SizedBox(height: 10),
                           TextFormField(
                             obscureText: true,
-                            decoration: kTfDecoration.copyWith(hintText: 'Mot de passe'),
+                            decoration: kTfDecoration.copyWith(hintText: 'Password'),
                             controller: _passwordController,
                             validator: Validator.password,
                           ),
@@ -130,7 +130,7 @@ class _SignupPageState extends State<SignupPage> {
                                       }
                                     },
                                     child: Text(
-                                      "Inscription",
+                                      "Signup",
                                       style: kBold18.copyWith(color: kWhite),
                                     ),
                                   ),

@@ -56,19 +56,52 @@ class _ChatCardState extends State<ChatCard> {
             padding: const EdgeInsets.all(10),
             child: Row(
               children: [
-                Image.asset("assets/${recipient.avatarNumber}.png"),
+                SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: Stack(
+                    children: [
+                      Image.asset("assets/${recipient.avatarNumber}.png"),
+                      if (recipient.isConnected)
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: Container(
+                            height: 13,
+                            width: 13,
+                            decoration: const BoxDecoration(
+                              color: Colors.green,
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(100),
+                              ),
+                            ),
+                          ),
+                        )
+                    ],
+                  ),
+                ),
                 const SizedBox(width: 10),
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      recipient.username,
-                      style: kBold14,
+                    Row(
+                      children: [
+                        Text(
+                          recipient.username,
+                          style: kBold14,
+                        ),
+                      ],
                     ),
-                    Text(
-                      widget.chat.messages.isEmpty ? "" : widget.chat.messages.first.text,
-                      style: kRegular12.copyWith(color: kGrey),
+
+                    /// Limit the width to display the ellipsis overflow
+                    /// Should be "dynamic".
+                    SizedBox(
+                      width: 200,
+                      child: Text(
+                        widget.chat.messages.isEmpty ? "" : widget.chat.messages.last.text,
+                        style: kRegular12.copyWith(color: kGrey),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ],
                 ),
@@ -80,9 +113,9 @@ class _ChatCardState extends State<ChatCard> {
                     Text(
                       widget.chat.messages.isEmpty
                           ? ""
-                          : DateTime.now().difference(widget.chat.messages.first.createdAt).inHours > 24
-                              ? widget.chat.messages.first.createdAt.getWeekday()
-                              : widget.chat.messages.first.createdAt.getTime(),
+                          : DateTime.now().difference(widget.chat.messages.last.createdAt).inHours > 24
+                              ? widget.chat.messages.last.createdAt.getWeekday()
+                              : widget.chat.messages.last.createdAt.getTime(),
                       style: kRegular12.copyWith(color: kGrey),
                     ),
                     // Upgrade : Implement notification with socket (unread message)

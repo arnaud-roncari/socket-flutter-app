@@ -9,7 +9,7 @@ class AuthRepository {
     required String password,
   }) async {
     Response response = await post(
-      Uri.parse('$kApiUrl/auth/login'),
+      Uri.parse('$kHttpUrl/auth/login'),
       headers: {
         'Content-type': 'application/json',
       },
@@ -20,9 +20,8 @@ class AuthRepository {
         },
       ),
     );
-
     if (response.statusCode < 200 || response.statusCode > 299) {
-      throwApiException(response);
+      throw ApiException.fromHttp(response);
     }
     return jsonDecode(response.body)["accessToken"];
   }
@@ -32,7 +31,7 @@ class AuthRepository {
     required String password,
   }) async {
     Response response = await post(
-      Uri.parse('$kApiUrl/auth/signup'),
+      Uri.parse('$kHttpUrl/auth/signup'),
       headers: {
         'Content-type': 'application/json',
       },
@@ -45,7 +44,7 @@ class AuthRepository {
     );
 
     if (response.statusCode < 200 || response.statusCode > 299) {
-      throwApiException(response);
+      throw ApiException.fromHttp(response);
     }
     return jsonDecode(response.body)["accessToken"];
   }

@@ -6,7 +6,7 @@ import 'package:socket_flutter_app/bloc/chat/chat_bloc.dart';
 import 'package:socket_flutter_app/bloc/create_chat/create_chat_bloc.dart';
 import 'package:socket_flutter_app/bloc/home/home_bloc.dart';
 import 'package:socket_flutter_app/repository/auth_repository.dart';
-import 'package:socket_flutter_app/repository/chat_repository.dart';
+import 'package:socket_flutter_app/repository/user_gateway.dart';
 import 'package:socket_flutter_app/repository/user_repository.dart';
 import 'package:socket_flutter_app/ui/page/auth_page.dart';
 import 'package:socket_flutter_app/ui/page/chat_page.dart';
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
         RepositoryProvider<AuthRepository>(create: (context) => AuthRepository()),
         RepositoryProvider<FlutterSecureStorage>(create: (context) => const FlutterSecureStorage()),
         RepositoryProvider<UserRepository>(create: (context) => UserRepository()),
-        RepositoryProvider<ChatRepository>(create: (context) => ChatRepository()),
+        RepositoryProvider<UserGateway>(create: (context) => UserGateway()),
       ],
       child: Builder(builder: (context) {
         return MultiBlocProvider(
@@ -40,17 +40,19 @@ class MyApp extends StatelessWidget {
             BlocProvider(
               create: (_) => HomeBloc(
                 userRepository: context.read<UserRepository>(),
-                chatRepository: context.read<ChatRepository>(),
+                userGateway: context.read<UserGateway>(),
               ),
             ),
             BlocProvider(
               create: (_) => CreateChatBloc(
                 userRepository: context.read<UserRepository>(),
-                chatRepository: context.read<ChatRepository>(),
+                userGateway: context.read<UserGateway>(),
               ),
             ),
             BlocProvider(
-              create: (_) => ChatBloc(),
+              create: (_) => ChatBloc(
+                userGateway: context.read<UserGateway>(),
+              ),
             ),
           ],
           child: MaterialApp(

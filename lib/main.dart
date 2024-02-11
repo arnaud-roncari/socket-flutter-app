@@ -4,8 +4,6 @@ import 'package:socket_flutter_app/app.dart';
 import 'package:socket_flutter_app/common/constants.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-/// TODO Avant de finir la base du back, tester sur iPhone et régler les bug (clavier qui s'ouvre et qui cache)
-/// Puis on fait un petit clean du projet
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 

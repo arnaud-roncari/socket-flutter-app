@@ -1,0 +1,45 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "socket-flutter-app",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "socket-flutter-app (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "socket-flutter-app (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "iPhone 1",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "2C05163B-2528-41ED-A583-4F2942E4CAFA"
+        },
+        {
+            "name": "iPhone 2",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "9CF523A3-6AAA-4FDA-8407-82B3EE07EB18"
+        }
+    ],
+    
+        "compounds": [
+            {
+                "name": "All iPhones",
+                "configurations": ["iPhone 2", "iPhone 1"]
+            }
+        ]
+    
+}
