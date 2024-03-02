@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:socket_flutter_app/common/constants.dart';
 import 'package:socket_flutter_app/common/exception.dart';
 import 'package:socket_flutter_app/model/chat_model.dart';
 import 'package:socket_flutter_app/model/message_model.dart';
@@ -16,8 +17,9 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   late UserModel recipient;
   late UserModel sender;
 
-  ChatBloc({required this.userGateway}) : super(ChatInitial()) {
+  ChatBloc({required this.userGateway}) : super(ChatOpened()) {
     on<OnChatOpened>(_onChatOpened);
+    on<OnChatClosed>(_onChatClosed);
     on<OnCreateMessage>(_onCreateMessage);
     on<OnCreateMessageFailed>(_onCreateMessageFailed);
     on<OnCreatedMessageSuccess>(_onCreateMessageSuccess);
@@ -66,10 +68,34 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     );
     recipient = event.recipient;
     sender = event.sender;
+
+    /// Used for notifications
+    kOpenedChatId = chat.id;
+
+    // Update read status
+    List<String> messageIds = [];
+    for (MessageModel message in chat.messages) {
+      if (message.hasBeenRead == false && message.userId == recipient.id) {
+        messageIds.add(message.id);
+      }
+    }
+
+    if (messageIds.isNotEmpty) {
+      userGateway.readMessages(chatId: chat.id, messageIds: messageIds);
+    }
+  }
+
+  void _onChatClosed(OnChatClosed event, Emitter<ChatState> emit) {
+    emit(ChatClosed());
+
+    /// Used for notifications.
+    kOpenedChatId = null;
   }
 
   void _onCreateMessage(OnCreateMessage event, Emitter<ChatState> emit) {
     MessageModel message = MessageModel(
+      id: "",
+      hasBeenRead: false,
       userId: sender.id,
       text: event.text,
       createdAt: DateTime.now(),
@@ -78,7 +104,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     );
     chat.messages.add(message);
     // Reload front to clear the controller and make the message appears.
-    emit(ChatInitial());
+    emit(ChatOpened());
     userGateway.createMessage(
       requestUuid: message.requestUuid!,
       chatId: event.chat.id,
@@ -94,7 +120,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         break;
       }
     }
-    emit(ChatInitial());
+    emit(ChatOpened());
   }
 
   void _onCreateMessageFailed(OnCreateMessageFailed event, Emitter<ChatState> emit) {
@@ -105,7 +131,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         break;
       }
     }
-    emit(ChatInitial());
+    emit(ChatOpened());
   }
 
   void _onNewMessage(OnNewMessage event, Emitter<ChatState> emit) {
@@ -113,22 +139,27 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     /// And also verify that we don't had 2 time the message, if it's from the sender.
     /// Since it's already added in OnCreateMessageSuccess.
     if (event.chatId == chat.id && event.message.userId != sender.id) {
+      /// Update message read  status, if still opened (listener still working even if page is closed)
+      if (kOpenedChatId != null) {
+        userGateway.readMessages(chatId: chat.id, messageIds: [event.message.id]);
+      }
+
       chat.messages.add(event.message);
     }
-    emit(ChatInitial());
+    emit(ChatOpened());
   }
 
   void _onConnectedUser(OnConnectedUser event, Emitter<ChatState> emit) {
     if (event.userId == recipient.id) {
       recipient.isConnected = true;
-      emit(ChatInitial());
+      emit(ChatOpened());
     }
   }
 
   void _onDisconnectedUser(OnDisconnectedUser event, Emitter<ChatState> emit) {
     if (event.userId == recipient.id) {
       recipient.isConnected = false;
-      emit(ChatInitial());
+      emit(ChatOpened());
     }
   }
 
@@ -139,7 +170,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   void _onUserTyping(OnUserTyping event, Emitter<ChatState> emit) {
     if (chat.id == event.chatId && recipient.id == event.userId) {
       recipient.isTyping = event.isTyping;
-      emit(ChatInitial());
+      emit(ChatOpened());
     }
   }
 }

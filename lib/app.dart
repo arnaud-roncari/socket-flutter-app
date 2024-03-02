@@ -8,6 +8,7 @@ import 'package:socket_flutter_app/bloc/home/home_bloc.dart';
 import 'package:socket_flutter_app/repository/auth_repository.dart';
 import 'package:socket_flutter_app/repository/user_gateway.dart';
 import 'package:socket_flutter_app/repository/user_repository.dart';
+import 'package:socket_flutter_app/services/firebase_service.dart';
 import 'package:socket_flutter_app/ui/page/auth_page.dart';
 import 'package:socket_flutter_app/ui/page/chat_page.dart';
 import 'package:socket_flutter_app/ui/page/create_chat_page.dart';
@@ -57,6 +58,7 @@ class MyApp extends StatelessWidget {
           ],
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
+            navigatorKey: FirebaseService.navigatorKey,
             title: 'Memoji',
             initialRoute: isSession ? "/home" : "/auth",
             routes: {

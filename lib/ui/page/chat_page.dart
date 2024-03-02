@@ -37,6 +37,7 @@ class _ChatPageState extends State<ChatPage> {
           children: [
             IconButton(
               onPressed: () {
+                context.read<ChatBloc>().add(OnChatClosed());
                 Navigator.pop(context);
               },
               icon: const Icon(Icons.arrow_back_ios),

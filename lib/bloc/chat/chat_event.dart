@@ -11,6 +11,8 @@ class OnChatOpened extends ChatEvent {
   OnChatOpened({required this.recipient, required this.sender, required this.chat});
 }
 
+class OnChatClosed extends ChatEvent {}
+
 class OnCreateMessage extends ChatEvent {
   final String text;
   final ChatModel chat;

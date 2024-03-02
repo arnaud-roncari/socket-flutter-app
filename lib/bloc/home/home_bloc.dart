@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:socket_flutter_app/model/chat_model.dart';
 import 'package:socket_flutter_app/model/message_model.dart';
@@ -28,6 +29,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<OnConnectedUsers>(_onConnectedUsers);
     on<OnDisconnectedUser>(_onDisconnectedUser);
     on<OnUserTyping>(_onUserTyping);
+    on<OnMessageRead>(_onMessageRead);
 
     userGateway.onConnect((data) => add(OnConnectedSocket()));
     userGateway.onUserTyping(
@@ -36,6 +38,14 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           userId: userId,
           chatId: chatId,
           isTyping: isTyping,
+        ),
+      ),
+    );
+    userGateway.onMessageRead(
+      (chatId, messageIds) => add(
+        OnMessageRead(
+          chatId: chatId,
+          messageIds: messageIds,
         ),
       ),
     );
@@ -150,6 +160,25 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         }
       }
     }
+  }
+
+  /// Updarte read status
+  void _onMessageRead(OnMessageRead event, Emitter<HomeState> emit) {
+    late ChatModel chatToUpdate;
+    for (ChatModel chat in chats) {
+      if (chat.id == event.chatId) {
+        chatToUpdate = chat;
+      }
+    }
+
+    for (MessageModel message in chatToUpdate.messages) {
+      for (String id in event.messageIds) {
+        if (id == message.id) {
+          message.hasBeenRead = true;
+        }
+      }
+    }
+    emit(HomeSuccess(user: user, chats: chats));
   }
 
   @override

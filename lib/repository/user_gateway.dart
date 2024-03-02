@@ -64,6 +64,15 @@ class UserGateway {
     });
   }
 
+  void onMessageRead(void Function(String chatId, List<String> messageIds) handler) {
+    _socket.on("read-messages-response", (data) {
+      handler(
+        data["data"]["chat_id"],
+        List<String>.from(data["data"]["message_ids"]),
+      );
+    });
+  }
+
   /// Notify backend that sender is writing
   void typing({required String chatId, required bool isTyping}) {
     _socket.emit("typing", [
@@ -89,6 +98,15 @@ class UserGateway {
         "request_uuid": requestUuid,
         "chat_id": chatId,
         "text": text,
+      }
+    ]);
+  }
+
+  void readMessages({required String chatId, required List<String> messageIds}) {
+    _socket.emit("read-messages", [
+      {
+        "chat_id": chatId,
+        "message_ids": messageIds,
       }
     ]);
   }

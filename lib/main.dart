@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:socket_flutter_app/app.dart';
 import 'package:socket_flutter_app/common/constants.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:socket_flutter_app/services/firebase_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,6 +13,8 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+
+  await FirebaseService.initialize();
 
   /// Verify if an accessToken was stored.
   /// If there is, the user don't have to login.

@@ -7,6 +7,7 @@ class AuthRepository {
   Future<String> login({
     required String username,
     required String password,
+    required String? fcmToken,
   }) async {
     Response response = await post(
       Uri.parse('$kHttpUrl/auth/login'),
@@ -17,6 +18,7 @@ class AuthRepository {
         {
           "username": username,
           "password": password,
+          "fcm_token": fcmToken,
         },
       ),
     );
@@ -29,6 +31,7 @@ class AuthRepository {
   Future<String> signup({
     required String username,
     required String password,
+    required String? fcmToken,
   }) async {
     Response response = await post(
       Uri.parse('$kHttpUrl/auth/signup'),
@@ -39,6 +42,7 @@ class AuthRepository {
         {
           "username": username,
           "password": password,
+          "fcm_token": fcmToken,
         },
       ),
     );

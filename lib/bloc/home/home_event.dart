@@ -47,3 +47,10 @@ final class OnUserTyping extends HomeEvent {
 
   OnUserTyping({required this.chatId, required this.userId, required this.isTyping});
 }
+
+final class OnMessageRead extends HomeEvent {
+  final String chatId;
+  final List<String> messageIds;
+
+  OnMessageRead({required this.chatId, required this.messageIds});
+}

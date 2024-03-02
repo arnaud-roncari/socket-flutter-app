@@ -5,6 +5,7 @@ import 'package:socket_flutter_app/bloc/home/home_bloc.dart';
 import 'package:socket_flutter_app/common/decoration.dart';
 import 'package:socket_flutter_app/common/extensions/time.dart';
 import 'package:socket_flutter_app/model/chat_model.dart';
+import 'package:socket_flutter_app/model/message_model.dart';
 import 'package:socket_flutter_app/model/user_model.dart';
 
 class ChatCard extends StatefulWidget {
@@ -32,6 +33,34 @@ class _ChatCardState extends State<ChatCard> {
     }
   }
 
+  Widget _buildMessageUnreadIndicator() {
+    int counter = 0;
+
+    for (MessageModel message in widget.chat.messages) {
+      if (!message.hasBeenRead && message.userId == recipient.id) {
+        counter++;
+      }
+    }
+
+    if (counter == 0) {
+      return Container();
+    }
+
+    return Container(
+      height: 18,
+      width: 18,
+      decoration: const BoxDecoration(
+        color: kPrimary,
+        borderRadius: BorderRadius.all(Radius.circular(100)),
+      ),
+      child: Center(
+          child: Text(
+        counter.toString(),
+        style: kRegular10.copyWith(color: kWhite),
+      )),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -42,7 +71,7 @@ class _ChatCardState extends State<ChatCard> {
         borderRadius: const BorderRadius.all(Radius.circular(8)),
         child: InkWell(
           borderRadius: const BorderRadius.all(Radius.circular(8)),
-          onTap: () {
+          onTap: () async {
             context.read<ChatBloc>().add(
                   OnChatOpened(
                     recipient: recipient,
@@ -106,24 +135,26 @@ class _ChatCardState extends State<ChatCard> {
                   ],
                 ),
                 const Spacer(),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      widget.chat.messages.isEmpty
-                          ? ""
-                          : DateTime.now().difference(widget.chat.messages.last.createdAt).inHours > 24
-                              ? widget.chat.messages.last.createdAt.getWeekday()
-                              : widget.chat.messages.last.createdAt.getTime(),
-                      style: kRegular12.copyWith(color: kGrey),
-                    ),
-                    // Upgrade : Implement notification with socket (unread message)
-                    const Text(
-                      "",
-                      style: kRegular12,
-                    )
-                  ],
+                SizedBox(
+                  // Quick diryt fix
+                  height: 40,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        widget.chat.messages.isEmpty
+                            ? ""
+                            : DateTime.now().difference(widget.chat.messages.last.createdAt).inHours > 24
+                                ? widget.chat.messages.last.createdAt.getWeekday()
+                                : widget.chat.messages.last.createdAt.getTime(),
+                        style: kRegular12.copyWith(color: kGrey),
+                      ),
+                      const Spacer(),
+                      _buildMessageUnreadIndicator()
+                      // Upgrade : Implement notification with socket (unread message)
+                    ],
+                  ),
                 ),
               ],
             ),
